@@ -30,7 +30,8 @@
     z-index: 2;
     cursor: pointer;
   }
-  .boxed label {
+  
+  .radio label {
     display: inline-block;
     width: 40px;
     padding: 5px;
@@ -38,10 +39,10 @@
     transition: all 0.3s;
   }
   
-  .boxed input[type="radio"] {
+  .radio input[type="radio"] {
     display: none;
   }
   
-  .boxed input[type="radio"]:checked + label {
-    border: solid 2px #00A9A2;
+  .radio input[type="radio"]:checked + label {
+    background-color: #00A9A2;
   }

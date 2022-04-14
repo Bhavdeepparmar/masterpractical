@@ -42,13 +42,11 @@
                                     <a href="" class="icon-close" id="close-btn"></a>
                                 </div>
                             </div>
-                            <div class="py-3 row productborder">
-                                
-                                <div class=" d-flex col-3">
+                            <div class="py-3 row productborder added_product">
+                                <!-- <div class=" d-flex col-3">
                                     <div class="" style="height: 100px;width: 100px;">
                                         <img src="image/Rectangle 1.jpg" alt="" class="h-100" style="object-fit: cover;">
-                                    </div>
-                                    
+                                    </div> 
                                 </div>
                                 <div class="col-9">
                                     <div class="row align-items-center">
@@ -67,14 +65,12 @@
                                                 </div>
                                               </div>
                                         </div>
-                                   
                                         <div class="col-6 text-end">
                                             <a href="" class="icon-close" style="font-size: 14px;"></a>
                                             <p class="m-0 pt-6">$74.55</p>
                                         </div>
                                     </div> 
-        
-                                </div>
+                                </div> -->
                             </div>
                             <div class="pt-2">
                                 <div class="row pt-2" style="background-color: #EFF5F7;">
@@ -113,12 +109,10 @@
                                 </div>
                             </div>
                             <div class="py-3 row productborder">
-                                
                                 <div class=" d-flex col-3">
                                     <div class="" style="height: 100px;width: 100px;">
                                         <img src="image/Rectangle 1.jpg" alt="" class="h-100" style="object-fit: cover;">
                                     </div>
-                                    
                                 </div>
                                 <div class="col-9">
                                     <div class="row align-items-center">
@@ -142,11 +136,9 @@
                                             <p class="m-0 pt-6">$74.55</p>
                                         </div>
                                     </div> 
-        
                                 </div>
                             </div>
                         </div>
-                            
                     </div>
                 </div>   
             </div>
@@ -364,20 +356,28 @@
   
     </script>
     <script  type="text/javascript">
-        
+        async function getproduct_data(){
+        const response = await fetch('products.json');
+        const users = await response.json();
+        return users;
+    }
+       let product_data=[];
         let colorCodeScript = document.querySelector('[data-swatches-colorlist-json]');
         let colorsList = JSON.parse(colorCodeScript.innerHTML);
-        console.log(colorsList);
         class masterpractical{
             constructor(){
-                window.addEventListener('load',this.bodyonloadcard.bind(this));
+        
                 this.Hearticon=document.querySelector('#icon-heart');
                 this.Bagicon=document.querySelector('#icon-bag');
-                
                 this.dCloseBtn=document.querySelector('#close-btn');
                 this.dCloseBtn.addEventListener('click',this.CloseEvent.bind(this));
                 this.WcloseBtn=document.querySelector('#wish-close');
                 this.WcloseBtn.addEventListener('click',this.CloseEvent.bind(this));
+                getproduct_data().then(data =>{
+                product_data = data;
+                this.bodyonloadcard(product_data)
+            });
+                
             }
             CloseEvent(event){
                 event.preventDefault();
@@ -386,15 +386,13 @@
                 let closewish=document.querySelector('#wish-list');
                 closewish.classList.remove("show");
             }
-           
-            bodyonloadcard(event){
-                var url="products.json";
+            bodyonloadcard(product_data){
+                // var url="products.json";
                 var paginationwraaper=document.querySelector('#paginations');
-                fetch(url)
-                .then(response => response.json())
-                
-                .then(data => {
-                    let totalcount=data.products.length;
+                // fetch(url)
+                // .then(response => response.json())
+                // .then(data => {
+                    let totalcount=product_data.products.length;
                     let perpagecount=12;
                      let perpagecard = Math.ceil(totalcount/perpagecount);
                      for (let i=0;i<perpagecard;i++){
@@ -411,62 +409,66 @@
                         pageitem.addEventListener('click',(event)=>{
                         let  end=count*perpagecount-1;
                         let start=end -perpagecount+1;
-                        localStorage.setItem("Start",start);
-                            localStorage.setItem("End",end+1);
-                            location.reload();
-
+                       
                         })
-
                      }
-                    let start = localStorage.getItem("Start");
-                    let end = localStorage.getItem("End");
-                    let productcarddata=data.products;
+                    
+                    let productcarddata=product_data.products;
                     let outputcard=document.querySelector('.outputcard');
                     let optionsHTML = '<div class="product-options">';
+                    let currenturl =  window.location.search;
+                    let pagnatiosnumber = currenturl.split('?page=')[1];
+                    if(pagnatiosnumber==null ||pagnatiosnumber==''){
+                        window.location.href = "http://127.0.0.1:5500/master.html?page=1";
+                    }
+                    let end = pagnatiosnumber * 12;
+                    let start = end-12;   
                     for(let i = start;i<end; i++){
-                        let product = data.products[i];
+                        let product = product_data.products[i];
                         let optionsHTML = '<div class="product-options">';
                         product.options.forEach(option => {
                         let optionName = option.name.toLowerCase();
-                        let optionHTML = `<div class="options-${optionName}" data-index="${option.position}">`;
-                            option.values.forEach(val => {
+                        let optionHTML = `<div class="options-${optionName} d-flex" data-position="${option.position}" data-name="${optionName}">`;
+                            option.values.forEach(value => {
                             if(optionName == 'color'){
-                                optionHTML += `<input class="form-check-input" type="radio" name="${optionName}" value="${val}" style="background-color:${colorsList[val]}"> `;
+                                optionHTML += ` <div class="pe-2">
+                                    <input class="form-check-input pe-2 radiobtns"  type="radio" id="${product.id}" data-index="${i}" name="${optionName}" value="${value}" style="background-color:${colorsList[value]}">
+                                                </div>`;
                             }
                             else if(optionName == 'size'){
                                 optionHTML += `
-                                    <form class="boxed py-2">
-                                    <input type="radio" id="${val}" name="size" value="" >
-                                    <label for="${val}" class="text-center">${val}</label>
-                                    
-                                `;
-                            }
-                        });
+                                    <div class="radio py-2 pe-2">
+                                    <input type="radio" id="${optionName}-${product.id}-${value}" name="size" value="${value}" class="radiobtns"  data-index="${i}" >
+                                    <label for="${optionName}-${product.id}-${value}" class="text-center">${value}</label>
+                                   </div>`;
+                                }
+                            });
                         optionHTML += '</div>';
                         optionsHTML += optionHTML;
-                    });
+                         });
                     optionsHTML += '</div>';
                         outputcard.innerHTML +=` 
-                          <div class="col-4">
-                            <div class="card h-100">
-                                <div class="img">
-                                <img src="${productcarddata[i].variants[0].featured_image.src}" class="card-img-top" alt="">
+
+                          <form class="col-4">
+                            <div class="card h-100"  data-index="${i}">
+                                <div class="">
+                                <img src="${productcarddata[i].variants[0].featured_image.src}" class="card-img-top " id="myImg" alt="">
                                 </div>
                                 <div class="card-body pt-3">
                                     <div class="row">
                                         <div class="col-8">
-                                            <h6 class="text-capitalize product-name">${data.products[i].handle}</h6>
+                                            <h6 class="text-capitalize product-name">${product_data.products[i].handle}</h6>
                                         </div>
                                         <div class="col-4 text-end">
-                                            <h6> $${data.products[i].variants[0].price}</h6>
+                                            <h6> $${product_data.products[i].variants[0].price}</h6>
                                         </div>
-                                    </div>
+                                    </div>                 
                                 </div>
                                 <div class="card-footer pt-3 pb-6">
                                     <div>${optionsHTML}</div>
                                         <div class="row align-items-center">
                                             <div class="col-9">
-                                            <a href="" class="btn font-size-sm">ADD TO CART</a>
+                                            <a href="" class="btn font-size-sm addcart" data-index="${i}">ADD TO CART</a>
                                         </div>
                                         <div class="col-3 text-center">
                                             <a href="" class="icon-heart btn-heart btn " style="font-size: 25px; color: #000 !important;"></a>
@@ -474,15 +476,79 @@
                                     </div>
                                 </div>  
                             </div>
-                    </div>`
+                    </form>`
+                    }
+                    this.addcart();
+                    this.radiochange();
+                // });
+            }
+            varient_change(){
+                let radiobtns=document.querySelectorAll('.radiobtns');
+                radiobtns.forEach((btn)=>{
+                    btn.addEventListener('change',this.onchangeradio.bind(this));
+                })
+            }
+            onchangeradio(event){
+                event.preventDefault();
+                let currentTarget=event.currentTarget;
+                
+                let closet_card= currentTarget.closest('.card');
+                let index = closet_card.dataset.index;
+                let productOptions = closet_card.querySelectorAll('[data-position]');
+                let color,size;
+                let selectVariant = null;
+                var image_src;
+                productOptions.forEach((item)=>{
+                    if(item.dataset.name == 'color'){
+                        color = item.querySelector('input[type="radio"]:checked').value;
+                        
+                    }else if(item.dataset.name == 'size'){
+                        size = item.querySelector('input[type="radio"]:checked').value;
+                        
                     }
                 });
+                product_data.products[index].variants.forEach(variant => {
+                    if(variant.option1 == `${color}` && variant.option2 == `${size}`)
+                    {
+                        selectVariant = variant;
+                        image_src = variant.featured_image.src;
+                        console.log(image_src)
+                    }
+                });
+                let card_img=closet_card.firstElementChild.firstElementChild;
+                card_img.src=image_src;
+                
+                
                 
             }
-           
+            onaddHandler(event){
+               
+
+            }
+            deleteproductcard(){
+                event.preventDefault();
+                let currentTarget=event.currentTarget;
+                console.log(currentTarget);
+                let del_record=currentTarget.closest(".added_product")
+                console.log(del_record);
+                del_record.style.display="none";
+
+            }
+            addcart(event){
+                let aadcartbtn=document.querySelectorAll('.addcart');         
+                aadcartbtn.forEach((btn)=>{
+                btn.addEventListener('click',this.onaddHandler.bind(this));
+                })
+                
+            }
+            radiochange(event){
+                let swatchs=document.querySelectorAll('.radiobtns');         
+                swatchs.forEach((btn)=>{
+                btn.addEventListener('change',this.onchangeradio.bind(this));
+                })
+                
+            }
         }        
         new masterpractical();
-
-        
     </script>
 </html>

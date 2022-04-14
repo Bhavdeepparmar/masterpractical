@@ -15557,22 +15557,4 @@ button {
 
 
 
-.boxed input[type="radio"]:checked + label {
-  border: solid 2px #00A9A2;
-}
-.boxed label {
-  display: inline-block;
-  width:40px;
-  padding:5px;
-  border: solid 2px #ccc;
-  transition: all 0.3s;
-}
-
-.boxed input[type="radio"] {
-  display: none;
-}
-
-.boxed input[type="radio"]:checked + label {
-  border-color: #00A9A2;
-}
 /*# sourceMappingURL=bootstrap.css.map */
